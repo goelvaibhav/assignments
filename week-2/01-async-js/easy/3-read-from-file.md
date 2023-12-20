@@ -5,3 +5,21 @@ You can use the fs library to as a black box, the goal is to understand async ta
 Try to do an expensive operation below the file read and see how it affects the output. 
 Make the expensive operation more and more expensive and see how it affects the output. 
 
+const fs = require("fs");
+
+
+function vaibhavReads(){
+  let a= new Promise( function (resolve){
+    fs.readFile("textFile.txt", "utf-8", function (err, response) {
+      resolve(response)
+    });
+  })
+  return a;
+}
+
+async function main(){
+  let b = await vaibhavReads();
+  console.log(b);
+}
+
+main();
