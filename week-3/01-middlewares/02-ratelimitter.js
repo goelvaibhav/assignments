@@ -11,10 +11,50 @@ const app = express();
 // You have been given a numberOfRequestsForUser object to start off with which
 // clears every one second
 
+
+
 let numberOfRequestsForUser = {};
 setInterval(() => {
     numberOfRequestsForUser = {};
 }, 1000)
+
+// incorrect fix that vaibhav did in first attemt  reason is less clarity of js.
+function rateLimiter(req, res, next){
+  let found = 0;
+  for(let i =0;i<numberOfRequestsForUser.lenght;i++){
+    if (numberOfRequestsForUser[i].user == req.user-id){
+      found = 1;
+      if(numberOfRequestsForUser[i].currentLimt >5){
+        res.status(404).json('Rate limit breached for user ' + req.user-id);
+      }else{
+        numberOfRequestsForUser[i].currentLimt+=1;
+      }
+    }
+  }
+  if(found == 0){
+    let data = { user: req.user-id, currentLimt : 1};
+    numberOfRequestsForUser.push (data);
+  }
+  next();
+}
+
+function rateLimiter2 (req, res, next){
+  let userId = req.header["user-id"];
+  if(numberOfRequestsForUser[userId]){
+    numberOfRequestsForUser[userId] +=1;
+    if(numberOfRequestsForUser[userId] >5){
+      res.status(404).json("limit breached");
+    }else{
+      next();
+    }
+  }else{
+    numberOfRequestsForUser[userId] =1;
+    next();
+  }
+}
+
+app.use(express.json());
+app.use(rateLimiter2);
 
 app.get('/user', function(req, res) {
   res.status(200).json({ name: 'john' });

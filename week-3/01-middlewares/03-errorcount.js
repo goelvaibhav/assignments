@@ -3,7 +3,13 @@ const assert = require('assert');
 const express = require('express');
 
 const app = express();
+app.use(express.json());
 let errorCount = 0;
+function catchError(err, req, res, next){
+  res.status(404).json("Error occured");
+  errorCount +=1;
+  next();
+}
 
 // You have been given an express server which has a few endpoints.
 // Your task is to
@@ -22,5 +28,7 @@ app.post('/user', function(req, res) {
 app.get('/errorCount', function(req, res) {
   res.status(200).json({ errorCount });
 });
+
+app.use(catchError);
 
 module.exports = app;
